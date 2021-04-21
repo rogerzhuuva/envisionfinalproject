@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<img src="SolarMap.png" alt="NREL Solar Irradiance Model" width = "800" >
 <h1>
-What color is your residential location?
+Welcome to SolCalc! This is a tool to help you make decisions on installing solar panels on your roof. (Scroll down to start data input and calculate how much value you get from installing solar panels)
+</h1>
+<img src="SolarMap.png" alt="NREL Solar Irradiance Model" width = "1200" >
+<h1>
+^ What color is your residential location (select in the drop down menu)? How many solar panels per person do you plan to install (select in the 2nd drop down menu)?
 </h1>
 <!-- Load css -->
 <link rel="stylesheet" href="styles.css">
+
+<!-- Add a svg area, empty -->
+<div id="scatter_area"></div>
 
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v4.js"></script>
@@ -13,10 +19,11 @@ What color is your residential location?
 <!-- Create a div where the circle will take place -->
 <div id="dataviz_builtWithD3"></div>
 
+
 <script>
 
 // Create data = list of groups
-var allGroup = ["yellow", "orange", "red"]
+var allColorGroup = ["yellow", "orange", "red"]
 
 // Initialize the button
 var dropdownButton = d3.select("#dataviz_builtWithD3")
@@ -24,14 +31,37 @@ var dropdownButton = d3.select("#dataviz_builtWithD3")
 
 // add the options to the button
 dropdownButton // Add a button
-  .selectAll('myOptions') // Next 4 lines add 6 options = 6 colors
- 	.data(allGroup)
+  .selectAll('myOptions') 
+ 	.data(allColorGroup)
   .enter()
 	.append('option')
   .text(function (d) { return d; }) // text showed in the menu
-  .attr("value", function (d) { return d; }) // corresponding value returned by the button
+  .attr("value", function (d) { return d; }) // corresponding value returned by the button 
+
+var allPanelGroup = ["0~3", "3~6", "6+"]
+
+// Initialize the button
+var dropdownButton2 = d3.select("#dataviz_builtWithD3")
+  .append('select')
+
+// add the options to the button
+dropdownButton2 // Add a button
+  .selectAll('myOptions') 
+ 	.data(allPanelGroup)
+  .enter()
+	.append('option')
+  .text(function (e) { return e; }) // text showed in the menu
+  .attr("value", function (e) { return e; }) // corresponding value returned by the button 
 
 // Initialize a circle
+var zeCircle0 = d3.select("#dataviz_builtWithD3")
+  .append("svg")
+  .append("circle")
+    .attr("cx", 100)
+    .attr("cy", 70)
+    .attr("stroke", "black")
+    .attr("r", 50)
+
 var zeCircle = d3.select("#dataviz_builtWithD3")
   .append("svg")
   .append("circle")
@@ -41,25 +71,11 @@ var zeCircle = d3.select("#dataviz_builtWithD3")
     .style("fill", "yellow")
     .attr("r", 20)
 
-
-
-// A function that update the color and size of the circle
+// A function that update the color of the circle
 function updateChart(mycolor) {
-  switch( mycolor ) {
-    case "red": 
-      mysize = 100;
-      break;
-    case "orange": 
-      mysize = 50;
-      break;
-    case "yellow": 
-      mysize = 20;
-      break; 
-  }
   zeCircle
     .transition()
     .duration(1000)
-    .style("r", mysize)
     .style("fill", mycolor)
 }
 
@@ -73,7 +89,35 @@ dropdownButton.on("change", function(d) {
     updateChart(selectedOption)
 })
 
+function updateChart2(myPanel) {
+  switch (myPanel){
+      case "0~3":
+      r = 20;
+      break;
+      case "3~6":
+      r = 35;
+      break;
+      case "6+":
+      r = 50;
+  }
+  zeCircle
+    .transition()
+    .duration(1000)
+    .style("r", r)
+}
 
+
+dropdownButton2.on("change", function(e) {
+
+    // recover the option that has been chosen
+    var selectedOption2 = d3.select(this).property("value")
+
+    // run the updateChart function with this selected option
+    updateChart2(selectedOption2)
+})
 
 
 </script>
+
+<h1> Black circle is the current state of your house without solar energy. For the colored circle, darker color means higher solar availability (capability of using solar as dominant energy source)  </h1>
+<h1> Size of black circle represents total household electricity usage. Colored circle is sized based on total solar energy harvested from solar panels installed. If the colored circle on the right is the same size as the black circle, your house can run 100% on solar!</h1>
