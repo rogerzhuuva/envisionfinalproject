@@ -1,6 +1,10 @@
-
+body {
+  background-color:  green;
+  opacity: 0.2;
+}
 h1 {
-  color: blue;
+  color: green;
+  opacity: 0.8;
   font-family: 'Times New Roman', Times, serif;
   font-size: 160%;
 }
